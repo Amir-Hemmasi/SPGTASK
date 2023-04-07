@@ -1,16 +1,45 @@
 const AWS = require('aws-sdk');
 const docClient = new AWS.DynamoDB.DocumentClient();
 const tableDataName = 'sampleData';
+AWS.config.update({
+  region: 'ca-central-1',
+});
 
-const getItemList = async (id) => {
-  const param = {
-    TableName: tableDataName,
+const dataWithPaging = (itemsPerPage, page, list) => {
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return list.slice(startIndex, endIndex);
+}
+
+const getItemList = async (id, token, filterBy, page, itemPerPage) => {
+  const usersParam = {
+    TableName: 'users',
   };
-  const allData = await docClient.scan(param).promise();
-  const body = {
-    items: allData.Items.filter(_ => _.userID === id),
-  };
-  return buildResponse(200, body);
+  const allUsers = await docClient.scan(usersParam).promise();
+  let user = allUsers.Items.find(_ => _.id === id && _.token === token);
+  if (user === undefined) {
+    return buildResponse(401, "Unauthorized");
+  }
+  if (filterBy === 'ALL') {
+
+    const param = {
+      TableName: tableDataName,
+    };
+    const allData = await docClient.scan(param).promise();
+    const body = {
+      items: dataWithPaging(itemPerPage ? itemPerPage : 10000, page ? page : 1, allData.Items.filter(_ => _.userID === id)),
+    };
+    return buildResponse(200, body);
+  } else {
+    const param = {
+      TableName: tableDataName,
+    };
+    const allData = await docClient.scan(param).promise();
+    const body = {
+      items: dataWithPaging(itemPerPage ? itemPerPage : 10000, page ? page : 1, allData.Items.filter(_ => _.userID === id).map(_ => _[filterBy])),
+    };
+    return buildResponse(200, body);
+  }
 };
 
 const createItem = async (reqBody) => {
@@ -145,9 +174,7 @@ const tokenGenerator = () => {
   return rand() + rand() + rand() + rand() + rand() + rand();
 }
 
-AWS.config.update({
-  region: 'ca-central-1',
-});
+
 
 exports.handler = async (event) => {
   let response = {
@@ -174,7 +201,9 @@ exports.handler = async (event) => {
       };
       break;
     case 'GET':
-      response = await getItemList(event['queryStringParameters']['id']);
+
+      response = await getItemList(event['queryStringParameters']['userID'], event['queryStringParameters']['token'],
+        event['queryStringParameters']['filterBy'], event['queryStringParameters']['page'], event['queryStringParameters']['itemPerPage']);
 
       break;
 

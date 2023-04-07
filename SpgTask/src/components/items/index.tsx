@@ -70,7 +70,7 @@ const style = {
 const Items = (props: {
   user: { id: string; email: string; password: string; token: string };
 }) => {
-  let getURL = `https://pei26i9x39.execute-api.ca-central-1.amazonaws.com/dev-amirh/user?id=${props.user.id}`;
+  let getURL = `https://pei26i9x39.execute-api.ca-central-1.amazonaws.com/dev-amirh/user?userID=${props.user.id}&token=${props.user.token}&filterBy=ALL&page=1&itemPerPage=100`;
   let url =
     'https://pei26i9x39.execute-api.ca-central-1.amazonaws.com/dev-amirh';
   const [data, setData] = useState([]);
