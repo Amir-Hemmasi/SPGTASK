@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -11,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LoadingButton from '@mui/lab/LoadingButton';
+import Notification from '../notification';
 import axios from 'axios';
 const theme = createTheme();
 type loginPageType = {
@@ -30,6 +30,9 @@ export default function SignIn(props: loginPageType) {
     id: '',
     token: '',
   });
+  const [showNoti, setShowNoti] = React.useState<boolean>(false);
+  const [notiMessage, setNotiMessage] = React.useState<string>('');
+  const [notiType, setNotiType] = React.useState<string>('');
 
   const login = (email: string, password: string) => {
     setIsLoading(true);
@@ -46,10 +49,20 @@ export default function SignIn(props: loginPageType) {
     let resp = axios.post(url, { email: email, password: password });
     resp
       .then((res) => {
+        setNotiType('success');
+        setNotiMessage(
+          `Welcome ${res.data.user.email
+            .split('@')[0]
+            .replace(/^\w/, (c: any) => c.toUpperCase())} `
+        );
+        setShowNoti(true);
         setUser(res.data.user);
         props.onLogin(res.data.user);
       })
       .catch((e) => {
+        setNotiType('error');
+        setNotiMessage(`Email or Password was not correct. Please try again`);
+        setShowNoti(true);
         setUser({ email: '', password: '', id: '', token: '' });
       })
       .finally(() => setIsLoading(false));
@@ -129,6 +142,14 @@ export default function SignIn(props: loginPageType) {
           </Box>
         </Box>
       </Container>
+      <Notification
+        onClose={() => {
+          setShowNoti(false);
+        }}
+        message={notiMessage}
+        showNoti={showNoti}
+        type={notiType}
+      ></Notification>
     </ThemeProvider>
   );
 }
