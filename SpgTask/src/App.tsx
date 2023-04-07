@@ -1,8 +1,8 @@
 import { useState } from 'react';
 // import reactLogo from './assets/react.svg';
 import './App.css';
-import Users from './components/users';
-import SignIn from './components/users/login';
+import Items from './components/items';
+import SignIn from './components/login';
 import Header from './components/header';
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
     <>
       {user.id !== '' && <Header user={user} />}
       <div className='App'>
-        {user.id !== '' && <Users user={user} />}
+        {user.id !== '' && <Items user={user} />}
         {user.id === '' && (
           <SignIn
             onLogin={(user: {

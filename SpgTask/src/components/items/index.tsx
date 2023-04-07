@@ -13,9 +13,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
 import Grid from './grid';
 import axios from 'axios';
-import Table from './table';
-import Loading from './loading';
-import Notification from './notification';
+import Loading from '../loading';
+import Notification from '../notification';
 
 const columns = [
   {
@@ -68,7 +67,7 @@ const style = {
   p: 5,
   borderColor: 'primary',
 };
-const Users = (props: {
+const Items = (props: {
   user: { id: string; email: string; password: string; token: string };
 }) => {
   let getURL = `https://pei26i9x39.execute-api.ca-central-1.amazonaws.com/dev-amirh/user?id=${props.user.id}`;
@@ -287,4 +286,4 @@ const Users = (props: {
   );
 };
 
-export default Users;
+export default Items;
