@@ -14,6 +14,7 @@ import Stack from '@mui/material/Stack';
 import Grid from './grid';
 import axios from 'axios';
 import Table from './table';
+import Loading from './loading';
 
 const columns = [
   {
@@ -75,18 +76,20 @@ const Users = (props: {
   const [data, setData] = useState([]);
   const getData = () => {
     setData([]);
-
+    setIsLoading(true);
     let resp = axios.get(getURL);
     resp
       .then((res) => {
         setData(res.data.items);
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log(e))
+      .finally(() => setIsLoading(false));
   };
   useEffect(() => {
     getData();
   }, []);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [dessert, setDessert] = useState('');
   const [calories, setCalories] = useState(0);
@@ -97,6 +100,7 @@ const Users = (props: {
   const [selectedItem, setSelectedItem] = useState();
 
   const deleteItem = () => {
+    setIsLoading(true);
     let response = axios.delete(url, {
       data: {
         item: selectedItem,
@@ -110,10 +114,12 @@ const Users = (props: {
       })
       .catch((e) => {
         console.log(e);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const saveHandler = () => {
+    setIsLoading(true);
     let response = axios.post(url, {
       item: {
         id: uuidv4().toString().trim(),
@@ -134,11 +140,13 @@ const Users = (props: {
       })
       .catch((e) => {
         console.log(e);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
     <>
+      {isLoading === true && <Loading />}
       <>
         <Grid
           width={'98%'}
@@ -152,6 +160,7 @@ const Users = (props: {
           }}
         ></Grid>
         <IconButton
+          disabled={isLoading}
           aria-label='delete'
           color='primary'
           onClick={() => {
@@ -169,9 +178,7 @@ const Users = (props: {
         >
           <AddIcon />
         </IconButton>
-        {/* <IconButton color='primary' aria-label='add to shopping cart'>
-            <CreateIcon />
-          </IconButton> */}
+
         <Modal
           open={modalIsOpen}
           onClose={() => {
@@ -233,7 +240,11 @@ const Users = (props: {
               />
             </Stack>
             <Stack spacing={1} padding={1} direction='row'>
-              <Button variant='contained' onClick={saveHandler}>
+              <Button
+                variant='contained'
+                disabled={isLoading}
+                onClick={saveHandler}
+              >
                 Save
               </Button>
               <Button
