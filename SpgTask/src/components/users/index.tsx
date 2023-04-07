@@ -15,6 +15,7 @@ import Grid from './grid';
 import axios from 'axios';
 import Table from './table';
 import Loading from './loading';
+import Notification from './notification';
 
 const columns = [
   {
@@ -90,6 +91,9 @@ const Users = (props: {
   }, []);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showNoti, setShowNoti] = useState<boolean>(false);
+  const [notiMessage, setNotiMessage] = useState<string>('');
+  const [notiType, setNotiType] = useState<string>('');
 
   const [dessert, setDessert] = useState('');
   const [calories, setCalories] = useState(0);
@@ -110,9 +114,15 @@ const Users = (props: {
     });
     response
       .then((res) => {
+        setNotiType('success');
+        setNotiMessage('Your item successfully deleted');
+        setShowNoti(true);
         getData();
       })
       .catch((e) => {
+        setNotiType('error');
+        setNotiMessage('Some thing went wrong. Please try again later');
+        setShowNoti(true);
         console.log(e);
       })
       .finally(() => setIsLoading(false));
@@ -135,10 +145,15 @@ const Users = (props: {
     });
     response
       .then((res) => {
-        //! check for resp susscedss
+        setNotiType('success');
+        setNotiMessage('Your item successfully added');
+        setShowNoti(true);
         getData();
       })
       .catch((e) => {
+        setNotiMessage('Some thing went wrong. Please try again later');
+        setNotiType('error');
+        setShowNoti(true);
         console.log(e);
       })
       .finally(() => setIsLoading(false));
@@ -258,6 +273,15 @@ const Users = (props: {
             </Stack>
           </Box>
         </Modal>
+
+        <Notification
+          onClose={() => {
+            setShowNoti(false);
+          }}
+          message={notiMessage}
+          showNoti={showNoti}
+          type={notiType}
+        ></Notification>
       </>
     </>
   );
