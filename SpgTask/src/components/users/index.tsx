@@ -67,7 +67,7 @@ const style = {
   borderColor: 'primary',
 };
 const Users = (props: {
-  user: { id: string; email: string; password: string };
+  user: { id: string; email: string; password: string; token: string };
 }) => {
   let getURL = `https://pei26i9x39.execute-api.ca-central-1.amazonaws.com/dev-amirh/user?id=${props.user.id}`;
   let url =
@@ -97,7 +97,13 @@ const Users = (props: {
   const [selectedItem, setSelectedItem] = useState();
 
   const deleteItem = () => {
-    let response = axios.delete(url, { data: selectedItem });
+    let response = axios.delete(url, {
+      data: {
+        item: selectedItem,
+        userID: props.user.id,
+        token: props.user.token,
+      },
+    });
     response
       .then((res) => {
         getData();
@@ -109,16 +115,21 @@ const Users = (props: {
 
   const saveHandler = () => {
     let response = axios.post(url, {
-      id: uuidv4().toString().trim(),
-      dessert: dessert.trim(),
-      calories: calories,
-      carbs: carbs,
-      fat: fat,
-      protein: protein,
+      item: {
+        id: uuidv4().toString().trim(),
+        dessert: dessert.trim(),
+        calories: calories,
+        carbs: carbs,
+        fat: fat,
+        protein: protein,
+        userID: props.user.id,
+      },
       userID: props.user.id,
+      token: props.user.token,
     });
     response
       .then((res) => {
+        //! check for resp susscedss
         getData();
       })
       .catch((e) => {

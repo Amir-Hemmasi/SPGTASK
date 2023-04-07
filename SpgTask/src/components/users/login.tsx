@@ -13,11 +13,21 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 const theme = createTheme();
 type loginPageType = {
-  onLogin: (user: any) => void;
+  onLogin: (user: {
+    email: string;
+    password: string;
+    id: string;
+    token: string;
+  }) => void;
 };
 
 export default function SignIn(props: loginPageType) {
-  const [user, setUser] = React.useState({ email: '', password: '', id: '' });
+  const [user, setUser] = React.useState({
+    email: '',
+    password: '',
+    id: '',
+    token: '',
+  });
 
   const login = (email: string, password: string) => {
     if (email.trim() === '' || password.trim() === '') {
@@ -27,18 +37,17 @@ export default function SignIn(props: loginPageType) {
     let url =
       'https://pei26i9x39.execute-api.ca-central-1.amazonaws.com/dev-amirh/login';
 
-    setUser({ email: '', password: '', id: '' });
+    setUser({ email: '', password: '', id: '', token: '' });
     props.onLogin(user);
 
     let resp = axios.post(url, { email: email, password: password });
     resp
       .then((res) => {
-        debugger;
         setUser(res.data.user);
         props.onLogin(res.data.user);
       })
       .catch((e) => {
-        setUser({ email: '', password: '', id: '' });
+        setUser({ email: '', password: '', id: '', token: '' });
       });
   };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

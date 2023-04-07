@@ -6,7 +6,12 @@ import SignIn from './components/users/login';
 import Header from './components/header';
 
 function App() {
-  const [user, setUser] = useState({ email: '', password: '', id: '' });
+  const [user, setUser] = useState({
+    email: '',
+    password: '',
+    id: '',
+    token: '',
+  });
 
   return (
     <>
@@ -15,7 +20,12 @@ function App() {
         {user.id !== '' && <Users user={user} />}
         {user.id === '' && (
           <SignIn
-            onLogin={(user: any) => {
+            onLogin={(user: {
+              email: string;
+              password: string;
+              id: string;
+              token: string;
+            }) => {
               setUser(user);
             }}
           />
