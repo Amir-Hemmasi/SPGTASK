@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import LoadingButton from '@mui/lab/LoadingButton';
 import axios from 'axios';
 const theme = createTheme();
 type loginPageType = {
@@ -22,6 +23,7 @@ type loginPageType = {
 };
 
 export default function SignIn(props: loginPageType) {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [user, setUser] = React.useState({
     email: '',
     password: '',
@@ -30,6 +32,7 @@ export default function SignIn(props: loginPageType) {
   });
 
   const login = (email: string, password: string) => {
+    setIsLoading(true);
     if (email.trim() === '' || password.trim() === '') {
       console.log('OOPS!');
       return;
@@ -48,7 +51,8 @@ export default function SignIn(props: loginPageType) {
       })
       .catch((e) => {
         setUser({ email: '', password: '', id: '', token: '' });
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -111,14 +115,17 @@ export default function SignIn(props: loginPageType) {
               control={<Checkbox value='remember' color='primary' />}
               label='Remember me'
             />
-            <Button
+            <LoadingButton
               type='submit'
               fullWidth
+              size='small'
+              loading={isLoading}
+              disabled={isLoading}
               variant='contained'
               sx={{ mt: 3, mb: 2 }}
             >
               Sign In
-            </Button>
+            </LoadingButton>
           </Box>
         </Box>
       </Container>
